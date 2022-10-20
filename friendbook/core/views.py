@@ -26,11 +26,14 @@ def signup(request):
             else:
                 user = User.objects.create_user(username=username, email=email, password=password)
                 user.save()
+                #login and redirect to settings
+                user_login = auth.authenticate(username=username, password=password)
+                auth.login(request, user_login)
                 #creating profile object for the new user
                 user_model = User.objects.get(username)
                 new_profile = User.objects.create_user(user=user_model, id_user=user_model.id)
                 new_profile.save()
-                return redirect('signup')
+                return redirect('settings')
         else:
             messages.info(request, "Passwords didn't match.")
             return redirect('signup')
@@ -56,5 +59,6 @@ def logout(request):
     auth.logout(request)
     return redirect('signin')
 
+@login_required(login_url='signin')
 def setting(request):
-    pass
+    return render(request, 'setting.html')
